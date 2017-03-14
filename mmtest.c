@@ -68,12 +68,12 @@ team_t team = {
 //Other Macros//
 
 // Puts pointers in the next and previous elements of free list
-#define SET_NEXT_PTR(blockp, p) (GET_NEXT_PTR(blockp) = p)
-#define SET_PREV_PTR(blockp, p) (GET_PREV_PTR(blockp) = p)
+#define SET_NEXT_PTR(bp, p) (GET_NEXT_PTR(bp) = p)
+#define SET_PREV_PTR(bp, p) (GET_PREV_PTR(bp) = p)
 
 // Given a pointer in a free list, get next and previous pointer
-#define GET_NEXT_PTR(blockp)  (*(char **)(blockp + WSIZE))
-#define GET_PREV_PTR(blockp)  (*(char **)(blockp))
+#define GET_NEXT_PTR(bp)  (*(char **)(bp + WSIZE))
+#define GET_PREV_PTR(bp)  (*(char **)(bp))
 
 
 
@@ -143,9 +143,9 @@ static void *find_fit(size_t asize){
   }
   else
     counter = 0;
-  for (blockp = freelistbegin; GET_ALLOC(HDRP(bp)) == 0; bp = GET_NEXT_PTR(bp))
+  for (bp = freelistbegin; GET_ALLOC(HDRP(bp)) == 0; bp = GET_NEXT_PTR(bp))
   {
-    if (asize <= (size_t)GET_SIZE(HDRP(blockp)))
+    if (asize <= (size_t)GET_SIZE(HDRP(bp)))
     {
       prevsize = asize;
       return bp;
@@ -187,7 +187,7 @@ static void freelistadd(void *bp){
 
 
 // removes a free block pointer from the free list
-static void freelistremove(void *blockp){
+static void freelistremove(void *bp){
   if (GET_PREV_PTR(bp))
   {
     SET_NEXT_PTR(GET_PREV_PTR(bp), GET_NEXT_PTR(bp));
@@ -298,8 +298,8 @@ void *mm_realloc(void *bp, size_t size)
           else {
             void *new_ptr = mm_malloc(newsize);
             place(new_ptr, newsize);
-            memcpy(new_ptr, blockp, newsize);
-            mm_free(blockp);
+            memcpy(new_ptr, bp, newsize);
+            mm_free(bp);
             return new_ptr;
           }
       }
